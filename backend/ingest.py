@@ -132,7 +132,7 @@ def embed_and_store(chunks: list[dict]) -> None:
             model="text-embedding-3-small",
             input=chunk["text"],
         )
-        print(f"Tokens used: {response.usage.total_tokens}")
+        # print(f"Tokens used: {response.usage.total_tokens}")
         vector = response.data[0].embedding
         index.upsert(vectors=[{
             "id": f"{chunk['source']}::chunk{chunk['chunk_index']}",
@@ -142,25 +142,6 @@ def embed_and_store(chunks: list[dict]) -> None:
 
     print(f"Stored {total} chunks in Pinecone")
 
-def test_query(question: str) -> None:
-    response = openai_client.embeddings.create(
-        model="text-embedding-3-small",
-        input=question
-    )
-    vector = response.data[0].embedding
-    
-    index = pc.Index(INDEX_NAME)
-    results = index.query(vector=vector, top_k=3, include_metadata=True)
-    
-    for match in results["matches"]:
-        print(f"Score: {match['score']}")
-        print(f"Source: {match['metadata']['source']}")
-        print(f"Text: {match['metadata']['text'][:300]}")
-        print("---")
-
-
-
-
 def main():
     repo_dir = "/tmp/cloned_repo"
     clone_repo(REPO_URL, repo_dir)
@@ -168,7 +149,6 @@ def main():
     chunks = collect_chunks(files)
     embed_and_store(chunks)
     print("Done!")
-    test_query("how does the navbar work?")
 
 
 if __name__ == "__main__":
