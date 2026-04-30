@@ -90,18 +90,20 @@ def embed_and_store(chunks: list[dict]) -> None:
 
     index = pc.Index(settings.pinecone_index_name)
 
-    response = openai_client.embeddings.create(
-        model=settings.embedding_model,
-        input=[chunk["text"] for chunk in chunks],
-    )
+    batch_size = 200
+    vectors = []
 
-    vectors = [
-        {
-            "id": f"{chunk['source']}::chunk{chunk['chunk_index']}",
-            "values": response.data[i].embedding,
-            "metadata": {"text": chunk["text"], "source": chunk["source"]},
-        }
-        for i, chunk in enumerate(chunks)
-    ]
+    for batch_start in range(0, len(chunks), batch_size):
+        batch = chunks[batch_start: batch_start + batch_size]
+        response = openai_client.embeddings.create(
+            model=settings.embedding_model,
+            input=[chunk["text"] for chunk in batch],
+        )
+        for i, chunk in enumerate(batch):
+            vectors.append({
+                "id": f"{chunk['source']}::chunk{chunk['chunk_index']}",
+                "values": response.data[i].embedding,
+                "metadata": {"text": chunk["text"], "source": chunk["source"]},
+            })
 
     index.upsert(vectors=vectors)
