@@ -89,6 +89,7 @@ def embed_and_store(chunks: list[dict]) -> None:
         )
 
     index = pc.Index(settings.pinecone_index_name)
+    index.delete(delete_all=True)
 
     batch_size = 200
     vectors = []
