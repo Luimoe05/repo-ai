@@ -1,11 +1,14 @@
 import RepoInput from '../components/RepoInput'
+import ThemeToggle from '../components/ThemeToggle'
 import { useIngest } from '../hooks/useIngest'
 
 interface HomeProps {
   onSuccess: (url: string, chunks: number) => void
+  theme: 'dark' | 'light'
+  onToggleTheme: () => void
 }
 
-export default function Home({ onSuccess }: HomeProps) {
+export default function Home({ onSuccess, theme, onToggleTheme }: HomeProps) {
   const { ingest, loading, error } = useIngest()
 
   const handleSubmit = async (url: string) => {
@@ -15,6 +18,7 @@ export default function Home({ onSuccess }: HomeProps) {
 
   return (
     <main className="home">
+      <ThemeToggle theme={theme} onToggle={onToggleTheme} className="home-theme-toggle" />
       <div className="home-content fade-up">
         <p className="home-badge">Powered by OpenAI · Pinecone</p>
         <h1 className="home-title">

@@ -7,14 +7,16 @@ interface QueryProps {
   repoUrl: string
   chunksStored: number
   onReset: () => void
+  theme: 'dark' | 'light'
+  onToggleTheme: () => void
 }
 
-export default function Query({ repoUrl, chunksStored, onReset }: QueryProps) {
+export default function Query({ repoUrl, chunksStored, onReset, theme, onToggleTheme }: QueryProps) {
   const { messages, ask, loading, error } = useQuery()
 
   return (
     <div className="query-page fade-in">
-      <Navbar repoUrl={repoUrl} onReset={onReset} />
+      <Navbar repoUrl={repoUrl} onReset={onReset} theme={theme} onToggleTheme={onToggleTheme} />
       <main className="query-body">
         <div className="query-meta fade-up">
           <span className="chunks-badge" aria-label={`${chunksStored.toLocaleString()} code chunks indexed`}>

@@ -1,5 +1,7 @@
 /* ── Design Tokens ────────────────────────────── */
 :root {
+  color-scheme: dark;
+
   /* Backgrounds */
   --bg:        oklch(9%  0.012 60);
   --surface:   oklch(13% 0.014 60);
@@ -10,10 +12,10 @@
   --border-hover: oklch(100% 0 0 / 0.15);
 
   /* Amber accent */
-  --accent:    oklch(76% 0.16 65);
-  --accent-dim: oklch(76% 0.16 65 / 0.12);
+  --accent:      oklch(76% 0.16 65);
+  --accent-dim:  oklch(76% 0.16 65 / 0.12);
   --accent-glow: oklch(76% 0.16 65 / 0.20);
-  --on-accent: oklch(11% 0.015 60);
+  --on-accent:   oklch(11% 0.015 60);
 
   /* Text */
   --text:           oklch(95% 0.01 80);
@@ -24,6 +26,11 @@
   --error:     oklch(70% 0.19 25);
   --error-dim: oklch(70% 0.19 25 / 0.12);
 
+  /* Glass surfaces */
+  --navbar-bg:     oklch(9%  0.012 60 / 0.88);
+  --footer-bg:     oklch(9%  0.012 60 / 0.92);
+  --home-gradient: oklch(76% 0.16 65 / 0.07);
+
   /* Radii */
   --radius:      10px;
   --radius-sm:    6px;
@@ -31,6 +38,39 @@
 
   /* Typography */
   --sans: 'Hanken Grotesk', system-ui, sans-serif;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Backgrounds */
+  --bg:        oklch(98% 0.005 80);
+  --surface:   oklch(93% 0.008 70);
+  --surface-2: oklch(88% 0.010 70);
+
+  /* Borders */
+  --border:       oklch(0% 0 0 / 0.08);
+  --border-hover: oklch(0% 0 0 / 0.18);
+
+  /* Amber accent (darkened for contrast on light backgrounds) */
+  --accent:      oklch(48% 0.20 65);
+  --accent-dim:  oklch(48% 0.20 65 / 0.12);
+  --accent-glow: oklch(48% 0.20 65 / 0.22);
+  --on-accent:   oklch(98% 0.005 80);
+
+  /* Text */
+  --text:           oklch(14% 0.012 60);
+  --text-secondary: oklch(40% 0.010 65);
+  --text-muted:     oklch(55% 0.009 65);
+
+  /* Semantic */
+  --error:     oklch(48% 0.22 25);
+  --error-dim: oklch(48% 0.22 25 / 0.10);
+
+  /* Glass surfaces */
+  --navbar-bg:     oklch(98% 0.005 80 / 0.90);
+  --footer-bg:     oklch(98% 0.005 80 / 0.94);
+  --home-gradient: oklch(48% 0.20 65 / 0.08);
 }
 
 /* ── Reset ────────────────────────────────────── */
@@ -49,6 +89,7 @@ body {
   -webkit-font-smoothing: antialiased;
   font-size: 1rem;
   line-height: 1.6;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 #root {
@@ -125,8 +166,8 @@ body {
   display: inline-block;
   width: 16px;
   height: 16px;
-  border: 2px solid oklch(100% 0 0 / 0.2);
-  border-top-color: oklch(100% 0 0 / 0.9);
+  border: 2px solid var(--border);
+  border-top-color: var(--text-secondary);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -138,7 +179,8 @@ body {
   align-items: center;
   justify-content: center;
   padding: 72px 32px;
-  background: radial-gradient(ellipse 55% 30% at 50% 0%, oklch(76% 0.16 65 / 0.07), transparent);
+  background: radial-gradient(ellipse 55% 30% at 50% 0%, var(--home-gradient), transparent);
+  position: relative;
 }
 
 .home-content {
@@ -264,7 +306,7 @@ body {
   padding: 0 24px;
   height: 56px;
   border-bottom: 1px solid var(--border);
-  background: oklch(9% 0.012 60 / 0.88);
+  background: var(--navbar-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   position: sticky;
@@ -443,7 +485,7 @@ body {
 .query-footer {
   border-top: 1px solid var(--border);
   padding: 14px 24px 18px;
-  background: oklch(9% 0.012 60 / 0.92);
+  background: var(--footer-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -519,6 +561,33 @@ body {
   text-align: left;
   margin-top: 0;
   margin-bottom: 12px;
+}
+
+/* ── Theme Toggle ─────────────────────────────── */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.theme-toggle:hover {
+  color: var(--text);
+  border-color: var(--border-hover);
+}
+
+.home-theme-toggle {
+  position: absolute;
+  top: 20px;
+  right: 24px;
 }
 
 /* ── Scrollbar ────────────────────────────────── */

@@ -1,9 +1,13 @@
+import ThemeToggle from './ThemeToggle'
+
 interface NavbarProps {
   repoUrl: string
   onReset: () => void
+  theme: 'dark' | 'light'
+  onToggleTheme: () => void
 }
 
-export default function Navbar({ repoUrl, onReset }: NavbarProps) {
+export default function Navbar({ repoUrl, onReset, theme, onToggleTheme }: NavbarProps) {
   const repoName = repoUrl.replace(/\.git$/, '').split('/').slice(-2).join('/')
 
   return (
@@ -12,6 +16,7 @@ export default function Navbar({ repoUrl, onReset }: NavbarProps) {
       <div className="navbar-repo" aria-label="Current repository">
         <span className="navbar-repo-name" title={repoName}>{repoName}</span>
       </div>
+      <ThemeToggle theme={theme} onToggle={onToggleTheme} />
       <button className="navbar-reset" onClick={onReset} aria-label="Start over with a new repository">
         <span aria-hidden="true">← </span>New repo
       </button>
