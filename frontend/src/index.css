@@ -29,7 +29,7 @@
   /* Glass surfaces */
   --navbar-bg:     oklch(9%  0.012 60 / 0.88);
   --footer-bg:     oklch(9%  0.012 60 / 0.92);
-  --home-gradient: oklch(76% 0.16 65 / 0.07);
+  --home-gradient: oklch(76% 0.16 65 / 0.13);
 
   /* Radii */
   --radius:      10px;
@@ -38,6 +38,9 @@
 
   /* Typography */
   --sans: 'Hanken Grotesk', system-ui, sans-serif;
+
+  /* Easing */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 [data-theme="light"] {
@@ -70,7 +73,7 @@
   /* Glass surfaces */
   --navbar-bg:     oklch(98% 0.005 80 / 0.90);
   --footer-bg:     oklch(98% 0.005 80 / 0.94);
-  --home-gradient: oklch(48% 0.20 65 / 0.08);
+  --home-gradient: oklch(48% 0.20 65 / 0.11);
 }
 
 /* ── Reset ────────────────────────────────────── */
@@ -151,8 +154,29 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.fade-up { animation: fadeUp  0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.fade-in { animation: fadeIn  0.35s ease forwards; }
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@keyframes navbarIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes iconSwap {
+  from { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+  to   { opacity: 1; transform: rotate(0deg)  scale(1); }
+}
+
+.fade-up { animation: fadeUp 0.5s var(--ease-out-expo) forwards; }
+.fade-in { animation: fadeIn 0.35s var(--ease-out-expo) forwards; }
+
+/* Stagger entrance — add .anim-in plus an optional delay modifier */
+.anim-in              { animation: fadeUp 0.6s var(--ease-out-expo) both; }
+.anim-in.anim-d1      { animation-delay: 100ms; }
+.anim-in.anim-d2      { animation-delay: 200ms; }
+.anim-in.anim-d3      { animation-delay: 300ms; }
 
 /* ── App Shell ────────────────────────────────── */
 .app {
@@ -179,36 +203,50 @@ body {
   align-items: center;
   justify-content: center;
   padding: 72px 32px;
-  background: radial-gradient(ellipse 55% 30% at 50% 0%, var(--home-gradient), transparent);
+  background: radial-gradient(ellipse 90% 55% at 50% -5%, var(--home-gradient), transparent);
   position: relative;
 }
 
 .home-content {
   width: 100%;
-  max-width: 620px;
-  text-align: left;
+  max-width: 740px;
+  text-align: center;
 }
 
 .home-badge {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 28px;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+
+.home-badge::before {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
 }
 
 .home-title {
-  font-size: clamp(3.25rem, 8vw, 5rem);
+  font-size: clamp(4rem, 11vw, 7.5rem);
   font-weight: 800;
-  line-height: 1.04;
+  line-height: 1.0;
   letter-spacing: -0.04em;
   color: var(--text);
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .title-accent {
+  display: block;
+  font-size: 1.15em;
   color: var(--accent);
 }
 
@@ -216,7 +254,7 @@ body {
   font-size: 1rem;
   line-height: 1.65;
   color: var(--text-secondary);
-  margin-bottom: 40px;
+  margin: 0 auto 52px;
   max-width: 52ch;
 }
 
@@ -224,6 +262,7 @@ body {
 .repo-form {
   width: 100%;
   max-width: 520px;
+  margin: 0 auto;
 }
 
 .input-wrapper {
@@ -276,7 +315,7 @@ body {
   border: none;
   cursor: pointer;
   color: var(--on-accent);
-  transition: opacity 0.2s, transform 0.15s;
+  transition: opacity 0.2s, transform 0.15s var(--ease-out-expo);
   flex-shrink: 0;
 }
 
@@ -312,12 +351,13 @@ body {
   position: sticky;
   top: 0;
   z-index: 10;
+  animation: navbarIn 0.4s var(--ease-out-expo) both;
 }
 
 .navbar-logo {
-  font-size: 0.9375rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
   color: var(--text);
   flex-shrink: 0;
 }
@@ -461,6 +501,41 @@ body {
   border-bottom-left-radius: 3px;
 }
 
+.message-bubble code {
+  font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+  font-size: 0.875em;
+  background: var(--surface-2);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.message-bubble pre {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin: 8px 0;
+  overflow-x: auto;
+}
+
+.message-bubble pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.typing-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 0.9em;
+  background: currentColor;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  opacity: 0.7;
+  animation: blink 0.75s step-end infinite;
+}
+
 /* Typing indicator */
 .typing {
   display: flex;
@@ -543,7 +618,7 @@ body {
   cursor: pointer;
   color: var(--on-accent);
   flex-shrink: 0;
-  transition: opacity 0.2s, transform 0.15s;
+  transition: opacity 0.2s, transform 0.15s var(--ease-out-expo);
 }
 
 .send-btn:hover:not(:disabled)  { opacity: 0.87; transform: scale(1.04); }
@@ -582,6 +657,13 @@ body {
 .theme-toggle:hover {
   color: var(--text);
   border-color: var(--border-hover);
+}
+
+.toggle-icon-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: iconSwap 0.2s var(--ease-out-expo) both;
 }
 
 .home-theme-toggle {

@@ -11,7 +11,9 @@ export default function ThemeToggle({ theme, onToggle, className }: ThemeToggleP
       onClick={onToggle}
       aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
     >
-      {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+      <span key={theme} className="toggle-icon-inner">
+        {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+      </span>
     </button>
   )
 }
