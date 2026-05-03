@@ -2,6 +2,7 @@ import axios from 'axios'
 import type { IngestResponse, QueryResponse } from '../types'
 
 const client = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
   headers: { 'Content-Type': 'application/json' },
 })
 
