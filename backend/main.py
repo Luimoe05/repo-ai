@@ -13,6 +13,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://repo-ai-six.vercel.app"],
+    allow_origin_regex=r"https://repo-ai-.*\.vercel\.app",
     allow_methods=["*"],
     allow_headers=["*"],
 )
