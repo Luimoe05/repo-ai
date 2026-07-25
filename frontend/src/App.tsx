@@ -2,33 +2,33 @@ import { useState } from 'react'
 import Home from './pages/Home'
 import Query from './pages/Query'
 import { useTheme } from './hooks/useTheme'
+import './App.css'
 
-type AppState = 'home' | 'query'
+interface Indexed {
+  url: string
+  chunks: number
+}
 
 export default function App() {
-  const [appState, setAppState] = useState<AppState>('home')
-  const [repoUrl, setRepoUrl] = useState('')
-  const [chunksStored, setChunksStored] = useState(0)
+  const [indexed, setIndexed] = useState<Indexed | null>(null)
   const { theme, toggle } = useTheme()
-
-  const handleIngestSuccess = (url: string, chunks: number) => {
-    setRepoUrl(url)
-    setChunksStored(chunks)
-    setAppState('query')
-  }
-
-  const handleReset = () => {
-    setAppState('home')
-    setRepoUrl('')
-    setChunksStored(0)
-  }
 
   return (
     <div className="app">
-      {appState === 'home' ? (
-        <Home onSuccess={handleIngestSuccess} theme={theme} onToggleTheme={toggle} />
+      {indexed ? (
+        <Query
+          repoUrl={indexed.url}
+          chunks={indexed.chunks}
+          onReset={() => setIndexed(null)}
+          theme={theme}
+          onToggleTheme={toggle}
+        />
       ) : (
-        <Query repoUrl={repoUrl} chunksStored={chunksStored} onReset={handleReset} theme={theme} onToggleTheme={toggle} />
+        <Home
+          onIndexed={(url, chunks) => setIndexed({ url, chunks })}
+          theme={theme}
+          onToggleTheme={toggle}
+        />
       )}
     </div>
   )

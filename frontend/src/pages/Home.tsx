@@ -3,40 +3,67 @@ import ThemeToggle from '../components/ThemeToggle'
 import { useIngest } from '../hooks/useIngest'
 
 interface HomeProps {
-  onSuccess: (url: string, chunks: number) => void
+  onIndexed: (url: string, chunks: number) => void
   theme: 'dark' | 'light'
   onToggleTheme: () => void
 }
 
-export default function Home({ onSuccess, theme, onToggleTheme }: HomeProps) {
-  const { ingest, loading, error } = useIngest()
+/** The real mechanics, stated plainly. This is the pitch — no feature cards. */
+const SPEC: [string, string][] = [
+  ['Parse', 'tree-sitter · functions & classes · py js ts jsx tsx'],
+  ['Index', 'text-embedding-3-small · 1536-d · cosine'],
+  ['Answer', 'gpt-4o-mini · top 5 chunks'],
+]
+
+export default function Home({ onIndexed, theme, onToggleTheme }: HomeProps) {
+  const { ingest, pending, error, elapsed } = useIngest()
 
   const handleSubmit = async (url: string) => {
     const result = await ingest(url)
-    if (result) onSuccess(url, result.chunks_stored)
+    if (result) onIndexed(url, result.chunks_stored)
   }
 
   return (
-    <main className="home">
-      <ThemeToggle theme={theme} onToggle={onToggleTheme} className="home-theme-toggle" />
-      <div className="home-content">
-        <p className="home-badge anim-in">Powered by OpenAI · Pinecone</p>
-        <h1 className="home-title anim-in anim-d1">
-          Ask your codebase
-          <span className="title-accent">anything.</span>
+    <main className="tp">
+      <header className="tp-head">
+        <span className="wordmark">Repo<span className="wordmark-ai">AI</span></span>
+        <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+      </header>
+
+      <span className="rule" aria-hidden="true" />
+
+      <div className="tp-main">
+        <h1 className="tp-lede">
+          <span className="tp-lede-line">You’ve been handed a repo</span>
+          <span className="tp-lede-line">you’ve never read.</span>
+          <span className="tp-lede-turn">Ask it questions instead.</span>
         </h1>
-        <p className="home-subtitle anim-in anim-d2">
-          Paste a GitHub repo URL and start asking questions about the code in plain English.
+
+        <p className="tp-sub">
+          Paste a GitHub URL. RepoAI reads the source and answers in plain English,
+          building the reference the repository never shipped with.
         </p>
-        <div className="anim-in anim-d3">
-          <RepoInput onSubmit={handleSubmit} loading={loading} error={error} />
-        </div>
-        {loading && (
-          <p className="loading-status fade-in" aria-live="polite">
-            Cloning and analyzing repository — this may take a minute...
-          </p>
-        )}
+
+        <RepoInput onSubmit={handleSubmit} pending={pending} error={error} elapsed={elapsed} />
+
+        <dl className="spec">
+          {SPEC.map(([key, value]) => (
+            <div key={key} style={{ display: 'contents' }}>
+              <dt className="label spec-key">{key}</dt>
+              <dd className="spec-val">{value}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
+
+      <footer className="tp-foot">
+        <p className="tp-credit">
+          Built by{' '}
+          <a className="tp-credit-link" href="https://www.luismoreno.space" target="_blank" rel="noopener noreferrer">
+            Luis-Angel Moreno
+          </a>
+        </p>
+      </footer>
     </main>
   )
 }

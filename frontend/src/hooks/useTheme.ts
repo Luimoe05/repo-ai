@@ -6,7 +6,9 @@ export function useTheme() {
   const [theme, setTheme] = useState<Theme>(() => {
     const stored = localStorage.getItem('theme') as Theme | null
     if (stored) return stored
-    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+    // Paper is the default; dark follows the system only when it asks for it.
+    // Must match the inline bootstrap in index.html or the first paint flips.
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   })
 
   useEffect(() => {

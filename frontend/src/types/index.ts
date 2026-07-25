@@ -7,8 +7,11 @@ export interface QueryResponse {
   answer: string
 }
 
-export interface Message {
+/** One numbered section of the document: a question and what came back. */
+export interface Exchange {
   id: string
-  role: 'user' | 'assistant'
-  content: string
+  n: number
+  question: string
+  answer: string | null
+  error: string | null
 }

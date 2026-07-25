@@ -1,23 +1,36 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ingestRepo } from '../api/client'
+import { describeIngestError } from '../api/errors'
 import type { IngestResponse } from '../types'
 
 export function useIngest() {
-  const [loading, setLoading] = useState(false)
+  const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [elapsed, setElapsed] = useState(0)
+
+  /* Elapsed time is the only progress figure we actually have — the backend
+     clones, parses, and embeds in a single request. Better an honest clock
+     than a progress bar that invents its own percentages. */
+  useEffect(() => {
+    if (!pending) return
+    const started = Date.now()
+    const tick = setInterval(() => setElapsed(Math.floor((Date.now() - started) / 1000)), 1000)
+    return () => clearInterval(tick)
+  }, [pending])
 
   const ingest = async (url: string): Promise<IngestResponse | null> => {
-    setLoading(true)
+    setElapsed(0)
+    setPending(true)
     setError(null)
     try {
       return await ingestRepo(url)
-    } catch (e: any) {
-      setError(e.response?.data?.detail ?? 'Failed to ingest repository. Check the URL and try again.')
+    } catch (e) {
+      setError(describeIngestError(e))
       return null
     } finally {
-      setLoading(false)
+      setPending(false)
     }
   }
 
-  return { ingest, loading, error }
+  return { ingest, pending, error, elapsed }
 }
