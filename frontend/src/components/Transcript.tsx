@@ -48,7 +48,7 @@ export default function Transcript({ exchanges, onAsk, onRetry }: TranscriptProp
 
             {x.answer && (
               <>
-                <div className="sec-a"><Prose content={x.answer} /></div>
+                <div className="sec-a"><Prose content={x.answer} animate /></div>
                 <p className="sec-src">
                   <span className="label">Drawn from the {TOP_K} nearest chunks</span>
                 </p>

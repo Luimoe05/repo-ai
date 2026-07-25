@@ -45,6 +45,14 @@ export default function Composer({ onSubmit, pending }: ComposerProps) {
           />
           <button className="action" type="submit" disabled={pending || !question.trim()}>
             {pending ? 'Reading' : 'Ask'}
+            {!pending && (
+              <span className="action-glyph" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 3v4a3 3 0 0 1-3 3H3" />
+                  <path d="M6 7 3 10l3 3" />
+                </svg>
+              </span>
+            )}
           </button>
         </div>
         <p className="label composer-hint">Enter to ask · Shift + Enter for a new line</p>

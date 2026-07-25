@@ -19,10 +19,11 @@
 
   /* Spruce ink accent — same green family as luismoreno.space, so a visitor
      arriving from the portfolio reads one hand at work. */
-  --accent:      oklch(42% 0.090 160);
-  --accent-wash: oklch(42% 0.090 160 / 0.09);
-  --accent-ring: oklch(42% 0.090 160 / 0.22);
-  --on-accent:   oklch(97.5% 0.005 150);
+  --accent:       oklch(42% 0.090 160);
+  --accent-hover: oklch(35% 0.095 160);
+  --accent-wash:  oklch(42% 0.090 160 / 0.09);
+  --accent-ring:  oklch(42% 0.090 160 / 0.22);
+  --on-accent:    oklch(97.5% 0.005 150);
 
   /* Oxide — errors only */
   --oxide:      oklch(46% 0.15 32);
@@ -57,10 +58,11 @@
   --rule:      oklch(100% 0 0 / 0.14);
   --rule-soft: oklch(100% 0 0 / 0.07);
 
-  --accent:      oklch(76% 0.115 160);
-  --accent-wash: oklch(76% 0.115 160 / 0.11);
-  --accent-ring: oklch(76% 0.115 160 / 0.26);
-  --on-accent:   oklch(16% 0.012 200);
+  --accent:       oklch(76% 0.115 160);
+  --accent-hover: oklch(84% 0.110 160);
+  --accent-wash:  oklch(76% 0.115 160 / 0.11);
+  --accent-ring:  oklch(76% 0.115 160 / 0.26);
+  --on-accent:    oklch(16% 0.012 200);
 
   --oxide:      oklch(71% 0.14 32);
   --oxide-wash: oklch(71% 0.14 32 / 0.13);
@@ -154,6 +156,14 @@ button, input, textarea {
 @keyframes swap-in {
   from { opacity: 0; transform: scale(0.7); }
   to   { opacity: 1; transform: none; }
+}
+
+/* Answer text arriving a word at a time. Mount order supplies the stagger,
+   so each token only has to fade itself in — no transform or filter, which
+   on inline text reads as a wobble rather than a reveal. */
+@keyframes token-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
