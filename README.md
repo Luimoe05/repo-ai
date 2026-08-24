@@ -5,9 +5,10 @@ Ask natural language questions about any GitHub repository. Paste a URL, and Rep
 ## How it works
 
 1. Paste a GitHub repo URL
-2. The backend clones the repo, parses it with Tree-sitter, and embeds the chunks via OpenAI
-3. Vectors are stored in Pinecone
-4. Ask questions — the backend retrieves relevant chunks and returns an answer
+2. The backend shallow-clones the repo (`--depth 1`), skipping lock files, build output and vendored code
+3. Tree-sitter splits each source file into functions, classes and methods, recording the line range of each
+4. Chunks are embedded via OpenAI in parallel and upserted to Pinecone in batches
+5. Ask questions — the backend retrieves the most relevant chunks and answers, citing file paths and line numbers
 
 ## Tech stack
 
@@ -69,7 +70,19 @@ The app runs at `http://localhost:5173`.
 
 ## API
 
-| Method | Endpoint  | Description                        |
-|--------|-----------|------------------------------------|
-| POST   | `/ingest` | Clone and embed a GitHub repo      |
-| POST   | `/query`  | Ask a question about the repo      |
+| Method | Endpoint  | Description                                  |
+|--------|-----------|----------------------------------------------|
+| GET    | `/health` | Liveness check; used to wake a sleeping host |
+| POST   | `/ingest` | Clone and embed a GitHub repo                |
+| POST   | `/query`  | Ask a question about the repo                |
+
+`/ingest` accepts only `https://` GitHub and GitLab URLs of the form
+`https://host/owner/repo`, and is rate-limited to 3 requests an hour.
+`/query` is limited to 30 a minute. Both return `Retry-After` on a 429.
+
+### Deployment note
+
+Both endpoints are defined with `def`, not `async def`, so FastAPI runs them in
+its threadpool. That is deliberate: the work is blocking, and an `async def`
+handler would run it on the event loop and stall every other request for the
+duration of an ingest.

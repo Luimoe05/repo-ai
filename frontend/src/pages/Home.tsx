@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import RepoInput from '../components/RepoInput'
 import ThemeToggle from '../components/ThemeToggle'
 import { useIngest } from '../hooks/useIngest'
@@ -16,9 +17,12 @@ const SPEC: [string, string][] = [
 ]
 
 export default function Home({ onIndexed, theme, onToggleTheme }: HomeProps) {
-  const { ingest, pending, error, elapsed } = useIngest()
+  const { ingest, pending, error, elapsed, failedAfter } = useIngest()
+
+  const lastUrl = useRef('')
 
   const handleSubmit = async (url: string) => {
+    lastUrl.current = url
     const result = await ingest(url)
     if (result) onIndexed(url, result.chunks_stored)
   }
@@ -44,7 +48,16 @@ export default function Home({ onIndexed, theme, onToggleTheme }: HomeProps) {
           building the reference the repository never shipped with.
         </p>
 
-        <RepoInput onSubmit={handleSubmit} pending={pending} error={error} elapsed={elapsed} />
+        <RepoInput
+          onSubmit={handleSubmit}
+          pending={pending}
+          error={error}
+          elapsed={elapsed}
+          failedAfter={failedAfter}
+          /* The connection dropped, but the server may have finished. Let the
+             visitor through to the query view rather than stranding them. */
+          onRecover={() => onIndexed(lastUrl.current, 0)}
+        />
 
         <dl className="spec">
           {SPEC.map(([key, value]) => (

@@ -5,6 +5,11 @@ interface RepoInputProps {
   pending: boolean
   error: string | null
   elapsed: number
+  /** Seconds the last failed attempt ran for. A failure after a long wait is
+   *  usually a dropped connection rather than a rejected repo — the server may
+   *  have finished indexing regardless. */
+  failedAfter: number
+  onRecover: () => void
 }
 
 /** Repos that index quickly, so a first-time visitor doesn't have to bring
@@ -17,7 +22,23 @@ const SEEDS = [
 
 const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 
-export default function RepoInput({ onSubmit, pending, error, elapsed }: RepoInputProps) {
+/** Name the stage actually running. A single static sentence promising "about
+ *  a minute" reads as broken once the clock passes it. */
+const phase = (s: number): string => {
+  if (s < 8) return 'Cloning the repository…'
+  if (s < 25) return 'Parsing with tree-sitter…'
+  if (s < 75) return 'Embedding chunks. This is the slow part.'
+  return 'Still going — large repositories can take two or three minutes.'
+}
+
+export default function RepoInput({
+  onSubmit,
+  pending,
+  error,
+  elapsed,
+  failedAfter,
+  onRecover,
+}: RepoInputProps) {
   const [url, setUrl] = useState('')
 
   const handleSubmit = (e: FormEvent) => {
@@ -75,9 +96,7 @@ export default function RepoInput({ onSubmit, pending, error, elapsed }: RepoInp
       {pending && (
         <div className="tp-progress" aria-live="polite">
           <p className="tp-progress-row">
-            <span className="tp-progress-note">
-              Cloning, parsing, and indexing. Large repositories take about a minute.
-            </span>
+            <span className="tp-progress-note">{phase(elapsed)}</span>
             <span className="tp-elapsed">{clock(elapsed)}</span>
           </p>
           <span className="scanline" aria-hidden="true" />
@@ -87,7 +106,17 @@ export default function RepoInput({ onSubmit, pending, error, elapsed }: RepoInp
       {error && (
         <p className="notice" role="alert">
           <span className="notice-tag">Failed</span>
-          <span className="notice-body">{error}</span>
+          <span className="notice-body">
+            {error}
+            {failedAfter > 25 && (
+              <>
+                {' '}
+                <button type="button" className="notice-action" onClick={onRecover}>
+                  Try asking anyway
+                </button>
+              </>
+            )}
+          </span>
         </p>
       )}
     </form>
