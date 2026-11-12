@@ -42,10 +42,10 @@ export function describeIngestError(e: unknown): string {
     return `Rate limit reached. RepoAI indexes 3 repositories an hour. ${retryAfter(err)}, or query the repo already indexed.`
   }
   if (isTimeout(err)) {
-    return 'That repository took longer than six minutes to index. It may be too large — try a smaller one.'
+    return 'That repository took longer than six minutes to index. Try a smaller repository.'
   }
   if (!err.response) {
-    return 'Lost contact with the RepoAI server. It may still be indexing, or it may have been asleep — wait a moment and try again.'
+    return 'Lost contact with the RepoAI server. It may still be indexing. Wait a moment and try again.'
   }
   return detailOf(err) ?? 'Could not index that repository. Check that the URL points to a public GitHub repo.'
 }
@@ -53,7 +53,7 @@ export function describeIngestError(e: unknown): string {
 export function describeQueryError(e: unknown): string {
   const err = e as ApiError
   if (err.response?.status === 429) {
-    return `Rate limit reached — 30 questions a minute. ${retryAfter(err)}.`
+    return `Rate limit reached: 30 questions a minute. ${retryAfter(err)}.`
   }
   if (isTimeout(err)) {
     return 'That question took too long to answer. Ask again.'

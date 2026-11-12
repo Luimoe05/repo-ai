@@ -3,6 +3,7 @@ import Home from './pages/Home'
 import Query from './pages/Query'
 import { useTheme } from './hooks/useTheme'
 import { warmBackend } from './api/client'
+import { transitionView } from './utils/transitionView'
 import './App.css'
 
 interface Indexed {
@@ -18,7 +19,11 @@ const STORAGE_KEY = 'repoai:indexed'
 const restore = (): Indexed | null => {
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as Indexed) : null
+    if (!raw) return null
+    const value: unknown = JSON.parse(raw)
+    if (!value || typeof value !== 'object' || !('url' in value) || !('chunks' in value)) return null
+    return typeof value.url === 'string' && typeof value.chunks === 'number'
+      ? { url: value.url, chunks: value.chunks } : null
   } catch {
     return null
   }
@@ -45,18 +50,21 @@ export default function App() {
   }, [])
 
   return (
-    <div className="app">
+    <div className={indexed ? 'app' : 'app app-home'}>
       {indexed ? (
         <Query
           repoUrl={indexed.url}
           chunks={indexed.chunks}
-          onReset={() => setIndexed(null)}
+          onReset={() => transitionView(() => {
+            setIndexed(null)
+            requestAnimationFrame(() => document.getElementById('repo-url')?.focus({ preventScroll: true }))
+          })}
           theme={theme}
           onToggleTheme={toggle}
         />
       ) : (
         <Home
-          onIndexed={(url, chunks) => setIndexed({ url, chunks })}
+          onIndexed={(url, chunks) => transitionView(() => setIndexed({ url, chunks }))}
           theme={theme}
           onToggleTheme={toggle}
         />

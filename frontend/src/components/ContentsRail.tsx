@@ -11,10 +11,10 @@ interface ContentsRailProps {
  *  jump targets — not ornament. */
 export default function ContentsRail({ exchanges, activeId, onJump }: ContentsRailProps) {
   return (
-    <nav className="rail" aria-label="Contents">
-      <p className="label rail-label">Contents</p>
+    <nav className="rail" aria-label="Your questions">
+      <p className="label rail-label">Your questions</p>
       {exchanges.length === 0 ? (
-        <p className="rail-empty">Sections appear as you ask.</p>
+        <p className="rail-empty">Your questions will appear here. Select one to return to its answer.</p>
       ) : (
         <ul className="rail-list">
           {exchanges.map(x => (

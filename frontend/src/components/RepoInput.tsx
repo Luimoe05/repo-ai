@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
+import { repositoryUrl } from '../utils/repositoryUrl'
 
 interface RepoInputProps {
   onSubmit: (url: string) => void
@@ -15,9 +16,9 @@ interface RepoInputProps {
 /** Repos that index quickly, so a first-time visitor doesn't have to bring
  *  their own. The first one is this app's own source. */
 const SEEDS = [
-  { label: 'Luimoe05/repo-ai', url: 'https://github.com/Luimoe05/repo-ai', self: true },
-  { label: 'sindresorhus/p-map', url: 'https://github.com/sindresorhus/p-map', self: false },
-  { label: 'psf/requests', url: 'https://github.com/psf/requests', self: false },
+  { label: 'Luimoe05/repo-ai', url: 'https://github.com/Luimoe05/repo-ai', description: 'Explore the source behind this tool', language: 'TypeScript' },
+  { label: 'sindresorhus/p-map', url: 'https://github.com/sindresorhus/p-map', description: 'Concurrent mapping for promises', language: 'JavaScript' },
+  { label: 'psf/requests', url: 'https://github.com/psf/requests', description: 'A familiar HTTP library for Python', language: 'Python' },
 ]
 
 const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
@@ -25,10 +26,8 @@ const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2,
 /** Name the stage actually running. A single static sentence promising "about
  *  a minute" reads as broken once the clock passes it. */
 const phase = (s: number): string => {
-  if (s < 8) return 'Cloning the repository…'
-  if (s < 25) return 'Parsing with tree-sitter…'
-  if (s < 75) return 'Embedding chunks. This is the slow part.'
-  return 'Still going — large repositories can take two or three minutes.'
+  if (s < 75) return 'Reading and indexing the repository…'
+  return 'Still indexing. Large repositories can take a few minutes.'
 }
 
 export default function RepoInput({
@@ -40,15 +39,35 @@ export default function RepoInput({
   onRecover,
 }: RepoInputProps) {
   const [url, setUrl] = useState('')
+  const [validation, setValidation] = useState<string | null>(null)
+  const [submittedUrl, setSubmittedUrl] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+  const selected = SEEDS.find(seed => seed.url === url.trim())
+  const visibleError = validation || (url === submittedUrl ? error : null)
+
+  const selectExample = (value: string) => {
+    setUrl(value)
+    setValidation(null)
+    inputRef.current?.focus({ preventScroll: true })
+  }
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    if (url.trim() && !pending) onSubmit(url.trim())
+    if (pending) return
+    const normalized = repositoryUrl(url)
+    if (!normalized) {
+      setValidation('Enter a GitHub repository, like github.com/owner/repo.')
+      inputRef.current?.focus({ preventScroll: true })
+      return
+    }
+    setValidation(null)
+    setSubmittedUrl(url)
+    onSubmit(normalized)
   }
 
   return (
-    <form className="tp-form" onSubmit={handleSubmit}>
-      <label htmlFor="repo-url" className="sr-only">GitHub repository URL</label>
+    <form className="tp-form" onSubmit={handleSubmit} noValidate>
+      <label htmlFor="repo-url" className="input-label">GitHub repository URL</label>
       <div className="field">
         <span className="field-mark" aria-hidden="true">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
@@ -56,59 +75,36 @@ export default function RepoInput({
           </svg>
         </span>
         <input
+          ref={inputRef}
           id="repo-url"
           className="field-input"
-          type="url"
+          type="text"
           inputMode="url"
           placeholder="https://github.com/owner/repo"
           value={url}
-          onChange={e => setUrl(e.target.value)}
+          onChange={e => { setUrl(e.target.value); setValidation(null) }}
           disabled={pending}
-          autoFocus
+          aria-describedby={visibleError ? 'repo-help repo-error' : 'repo-help'}
+          aria-invalid={!!visibleError}
+          required
+          title="Enter a public repository URL, such as https://github.com/owner/repo"
           autoComplete="url"
           spellCheck={false}
         />
         <button className="action" type="submit" disabled={pending || !url.trim()}>
-          {pending ? 'Indexing' : 'Index'}
+          {pending && <span className="busy-indicator" aria-hidden="true" />}
+          {pending ? 'Indexing…' : 'Explore repo'}
+          {!pending && <span aria-hidden="true">→</span>}
         </button>
       </div>
 
-      <div className="seeds">
-        <span className="label seeds-label">Or try</span>
-        {SEEDS.map(seed => (
-          <button
-            key={seed.url}
-            type="button"
-            className={seed.self ? 'seed seed-self' : 'seed'}
-            onClick={() => setUrl(seed.url)}
-            disabled={pending}
-            aria-label={
-              seed.self
-                ? `Use ${seed.label} — the source of this app`
-                : `Use ${seed.label}`
-            }
-          >
-            {seed.label}
-          </button>
-        ))}
-      </div>
-
-      {pending && (
-        <div className="tp-progress" aria-live="polite">
-          <p className="tp-progress-row">
-            <span className="tp-progress-note">{phase(elapsed)}</span>
-            <span className="tp-elapsed">{clock(elapsed)}</span>
-          </p>
-          <span className="scanline" aria-hidden="true" />
-        </div>
-      )}
-
-      {error && (
-        <p className="notice" role="alert">
+      <p className="input-help" id="repo-help">Public repositories only. Indexing may take a few minutes.</p>
+      {visibleError && (
+        <p className="notice" id="repo-error" role="alert">
           <span className="notice-tag">Failed</span>
           <span className="notice-body">
-            {error}
-            {failedAfter > 25 && (
+            {visibleError}
+            {!validation && failedAfter > 25 && (
               <>
                 {' '}
                 <button type="button" className="notice-action" onClick={onRecover}>
@@ -119,6 +115,30 @@ export default function RepoInput({
           </span>
         </p>
       )}
+      <div className="repo-feedback" aria-live="polite" aria-atomic="true">
+        {pending ? (
+          <div className="tp-progress">
+            <p className="tp-progress-row"><span>{phase(elapsed)}</span><span className="tp-elapsed" aria-hidden="true">{clock(elapsed)}</span></p>
+            <span className="scanline" aria-hidden="true" />
+          </div>
+        ) : <p className="selection-note">{selected ? <><span aria-hidden="true">✓</span> {selected.label} selected. Ready to explore.</> : 'Choose an example below, or bring your own repository.'}</p>}
+      </div>
+      <div className="seeds">
+        <h3 className="seeds-label">Or explore an example</h3>
+        <ul className="repo-examples">
+          {SEEDS.map(seed => (
+            <li key={seed.url}>
+              <button type="button" className="repo-example" aria-pressed={selected?.url === seed.url} onClick={() => selectExample(seed.url)} disabled={pending} aria-label={`Use ${seed.label}`}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M5 4h14v17H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" /><path d="M7 4v13M3 17h16M11 8h4M11 11h4" /></svg>
+                <span className="repo-example-info"><span className="repo-example-name">{seed.label}</span><span className="repo-example-note">{seed.description}</span></span>
+                <span className="repo-language">{seed.language}</span><span className="repo-example-arrow" aria-hidden="true">{selected?.url === seed.url ? '✓' : '→'}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+
     </form>
   )
 }

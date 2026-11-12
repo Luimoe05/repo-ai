@@ -6,7 +6,7 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>RepoAI — the manual your repo never shipped with</title>
+    <title>RepoAI | Understand your codebase</title>
     <meta
       name="description"
       content="Paste a GitHub URL. RepoAI parses the source with tree-sitter, indexes it, and answers questions about how it works in plain English."
@@ -15,23 +15,17 @@
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="RepoAI — the manual your repo never shipped with" />
+    <meta property="og:title" content="RepoAI | Understand your codebase" />
     <meta
       property="og:description"
       content="Paste a GitHub URL and ask questions about the codebase in plain English."
     />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Martian+Mono:wdth,wght@75..112.5,400..700&family=Newsreader:opsz,wght@6..72,300..600&family=Newsreader:ital,wght@1,400&display=swap"
-      rel="stylesheet"
-    />
-
     <script>
       (function () {
-        var t = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        var t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        try { var saved = localStorage.getItem('theme'); if (saved === 'dark' || saved === 'light') t = saved; } catch (_) {}
         document.documentElement.setAttribute('data-theme', t);
       })();
     </script>

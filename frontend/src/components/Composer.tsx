@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useLayoutEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 
 interface ComposerProps {
   onSubmit: (question: string) => void
@@ -7,12 +7,20 @@ interface ComposerProps {
 
 export default function Composer({ onSubmit, pending }: ComposerProps) {
   const [question, setQuestion] = useState('')
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+  useLayoutEffect(() => {
+    const input = inputRef.current
+    if (!input) return
+    input.style.height = 'auto'
+    input.style.height = `${Math.min(input.scrollHeight, 180)}px`
+  }, [question])
 
   const send = () => {
     const trimmed = question.trim()
     if (!trimmed || pending) return
     onSubmit(trimmed)
     setQuestion('')
+    inputRef.current?.focus({ preventScroll: true })
   }
 
   const handleSubmit = (e: FormEvent) => {
@@ -21,7 +29,7 @@ export default function Composer({ onSubmit, pending }: ComposerProps) {
   }
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault()
       send()
     }
@@ -33,17 +41,18 @@ export default function Composer({ onSubmit, pending }: ComposerProps) {
         <label htmlFor="question" className="sr-only">Ask a question about this repository</label>
         <div className="field">
           <textarea
+            ref={inputRef}
             id="question"
             className="composer-input"
             placeholder="Ask about this repo…"
             value={question}
             onChange={e => setQuestion(e.target.value)}
             onKeyDown={handleKeyDown}
-            disabled={pending}
-            rows={1}
-            autoFocus
+            rows={2}
+            aria-describedby="composer-hint"
           />
           <button className="action" type="submit" disabled={pending || !question.trim()}>
+            {pending && <span className="busy-indicator" aria-hidden="true" />}
             {pending ? 'Reading' : 'Ask'}
             {!pending && (
               <span className="action-glyph" aria-hidden="true">
@@ -55,7 +64,7 @@ export default function Composer({ onSubmit, pending }: ComposerProps) {
             )}
           </button>
         </div>
-        <p className="label composer-hint">Enter to ask · Shift + Enter for a new line</p>
+        <p className="label composer-hint" id="composer-hint">{pending ? 'Reading the source. You can draft your next question.' : 'Enter to ask · Shift + Enter for a new line'}</p>
       </form>
     </div>
   )

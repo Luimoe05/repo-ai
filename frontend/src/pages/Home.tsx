@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import RepoInput from '../components/RepoInput'
 import ThemeToggle from '../components/ThemeToggle'
+import Brand from '../components/Brand'
 import { useIngest } from '../hooks/useIngest'
 
 interface HomeProps {
@@ -9,18 +10,9 @@ interface HomeProps {
   onToggleTheme: () => void
 }
 
-/** The real mechanics, stated plainly. This is the pitch — no feature cards. */
-const SPEC: [string, string][] = [
-  ['Parse', 'tree-sitter · functions & classes · py js ts jsx tsx'],
-  ['Index', 'text-embedding-3-small · 1536-d · cosine'],
-  ['Answer', 'gpt-4o-mini · top 5 chunks'],
-]
-
 export default function Home({ onIndexed, theme, onToggleTheme }: HomeProps) {
   const { ingest, pending, error, elapsed, failedAfter } = useIngest()
-
   const lastUrl = useRef('')
-
   const handleSubmit = async (url: string) => {
     lastUrl.current = url
     const result = await ingest(url)
@@ -28,55 +20,35 @@ export default function Home({ onIndexed, theme, onToggleTheme }: HomeProps) {
   }
 
   return (
-    <main className="tp">
-      <header className="tp-head">
-        <span className="wordmark">Repo<span className="wordmark-ai">AI</span></span>
-        <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+    <div className="home">
+      <a className="skip-link" href="#workspace">Skip to repository input</a>
+      <header className="home-head">
+        <Brand />
+        <span className="header-context">Codebase explorer</span>
+        <div className="header-actions">
+          <a href="https://github.com/Luimoe05/repo-ai" target="_blank" rel="noopener noreferrer">Source code <span aria-hidden="true">↗</span></a>
+          <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+        </div>
       </header>
-
-      <span className="rule" aria-hidden="true" />
-
-      <div className="tp-main">
-        <h1 className="tp-lede">
-          <span className="tp-lede-line">You’ve been handed a repo</span>
-          <span className="tp-lede-line">you’ve never read.</span>
-          <span className="tp-lede-turn">Ask it questions instead.</span>
-        </h1>
-
-        <p className="tp-sub">
-          Paste a GitHub URL. RepoAI reads the source and answers in plain English,
-          building the reference the repository never shipped with.
-        </p>
-
-        <RepoInput
-          onSubmit={handleSubmit}
-          pending={pending}
-          error={error}
-          elapsed={elapsed}
-          failedAfter={failedAfter}
-          /* The connection dropped, but the server may have finished. Let the
-             visitor through to the query view rather than stranding them. */
-          onRecover={() => onIndexed(lastUrl.current, 0)}
-        />
-
-        <dl className="spec">
-          {SPEC.map(([key, value]) => (
-            <div key={key} style={{ display: 'contents' }}>
-              <dt className="label spec-key">{key}</dt>
-              <dd className="spec-val">{value}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-
-      <footer className="tp-foot">
-        <p className="tp-credit">
-          Built by{' '}
-          <a className="tp-credit-link" href="https://www.luismoreno.space" target="_blank" rel="noopener noreferrer">
-            Luis-Angel Moreno
-          </a>
-        </p>
-      </footer>
-    </main>
+      <main className="home-layout" id="workspace" tabIndex={-1}>
+        <aside className="home-intro">
+          <p className="eyebrow">From unfamiliar to understood</p>
+          <h1>A shorter path<br /> into the code.</h1>
+          <p className="intro-note">Ask questions about a GitHub repository. Get answers grounded in its source.</p>
+          <ol className="workflow">
+            <li><span className="workflow-number">1</span><div><h2>Bring a repository</h2><p>Start with a public GitHub URL.</p></div></li>
+            <li><span className="workflow-number">2</span><div><h2>Let us read the source</h2><p>We index the code so you don’t have to.</p></div></li>
+            <li><span className="workflow-number">3</span><div><h2>Follow your questions</h2><p>Explore the architecture, entry points, and decisions.</p></div></li>
+          </ol>
+          <div className="intro-bottom"><span className="language-mark" aria-hidden="true">{ '{ }' }</span><p>Reads Python, JavaScript,<br />and TypeScript source files.</p></div>
+        </aside>
+        <section className="home-workspace" aria-labelledby="open-title">
+          <div className="workspace-heading"><span className="section-kicker">Start exploring</span><h2 id="open-title">Open a repository</h2><p>Which codebase would you like to understand?</p></div>
+          <RepoInput onSubmit={handleSubmit} pending={pending} error={error} elapsed={elapsed} failedAfter={failedAfter} onRecover={() => onIndexed(lastUrl.current, 0)} />
+          <div className="question-preview"><h3>A few places to start</h3><p>“Where does execution start?”</p><p>“How is the code organized?”</p><p>“What happens when a request comes in?”</p></div>
+        </section>
+      </main>
+      <footer className="home-foot"><p>Built by <a href="https://www.luismoreno.space" target="_blank" rel="noopener noreferrer">Luis-Angel Moreno <span aria-hidden="true">↗</span></a></p><span>Read less. Understand more.</span></footer>
+    </div>
   )
 }

@@ -1,119 +1,92 @@
-/* ── Design Tokens ────────────────────────────── */
-/* Paper is the default: this is a tool for reading. */
 :root {
   color-scheme: light;
-
-  /* Surfaces — cool gray-green stock, not cream */
-  --paper:      oklch(93.2% 0.008 150);
-  --sheet:      oklch(97.2% 0.005 150);
-  --sunk:       oklch(95.0% 0.006 150);
-
-  /* Ink */
-  --ink:    oklch(21% 0.014 230);
-  --ink-2:  oklch(43% 0.012 220);
-  --ink-3:  oklch(46% 0.011 200);
-
-  /* Rules */
-  --rule:      oklch(80% 0.011 150);
-  --rule-soft: oklch(87% 0.008 150);
-
-  /* Spruce ink accent — same green family as luismoreno.space, so a visitor
-     arriving from the portfolio reads one hand at work. */
-  --accent:       oklch(42% 0.090 160);
-  --accent-hover: oklch(35% 0.095 160);
-  --accent-wash:  oklch(42% 0.090 160 / 0.09);
-  --accent-ring:  oklch(42% 0.090 160 / 0.22);
-  --on-accent:    oklch(97.5% 0.005 150);
-
-  /* Oxide — errors only */
-  --oxide:      oklch(46% 0.15 32);
-  --oxide-wash: oklch(46% 0.15 32 / 0.09);
-
-  /* Type */
-  --face-mono: 'Martian Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  --face-text: 'Newsreader', Georgia, 'Times New Roman', serif;
-  --face-code: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-
-  /* Rhythm */
-  --gutter: 3.5rem;
-  --measure: 66ch;
-  --radius: 3px;
-
-  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --paper: oklch(98% .003 300);
+  --sheet: oklch(99.4% .002 300);
+  --sunk: oklch(95% .008 300);
+  --intro: oklch(94.6% .016 300);
+  --ink: oklch(25% .018 300);
+  --ink-2: oklch(44% .018 300);
+  --ink-3: oklch(49% .014 300);
+  --rule: oklch(83% .013 300);
+  --rule-soft: oklch(90% .009 300);
+  --accent: oklch(43% .12 310);
+  --accent-hover: oklch(36% .12 310);
+  --accent-wash: oklch(43% .12 310 / .08);
+  --accent-ring: oklch(43% .12 310 / .2);
+  --on-accent: oklch(98% .005 300);
+  --oxide: oklch(45% .16 30);
+  --oxide-wash: oklch(45% .16 30 / .07);
+  --face-text: -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --face-code: ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --radius: 8px;
+  --ease: cubic-bezier(.22,1,.36,1);
 }
 
-[data-theme="dark"] {
+[data-theme=dark] {
   color-scheme: dark;
-
-  /* The same document under a desk lamp — held off pure black on purpose,
-     so it reads as dark paper stock rather than a terminal. */
-  --paper: oklch(20.0% 0.022 190);
-  --sheet: oklch(23.5% 0.022 190);
-  --sunk:  oklch(27.0% 0.022 190);
-
-  --ink:   oklch(94% 0.008 150);
-  --ink-2: oklch(76% 0.010 170);
-  --ink-3: oklch(65% 0.012 180);
-
-  --rule:      oklch(100% 0 0 / 0.14);
-  --rule-soft: oklch(100% 0 0 / 0.07);
-
-  --accent:       oklch(76% 0.115 160);
-  --accent-hover: oklch(84% 0.110 160);
-  --accent-wash:  oklch(76% 0.115 160 / 0.11);
-  --accent-ring:  oklch(76% 0.115 160 / 0.26);
-  --on-accent:    oklch(16% 0.012 200);
-
-  --oxide:      oklch(71% 0.14 32);
-  --oxide-wash: oklch(71% 0.14 32 / 0.13);
+  --paper: oklch(19% .009 300);
+  --sheet: oklch(21% .01 300);
+  --sunk: oklch(25% .013 300);
+  --intro: oklch(23% .02 300);
+  --ink: oklch(93% .006 300);
+  --ink-2: oklch(77% .012 300);
+  --ink-3: oklch(69% .015 300);
+  --rule: oklch(39% .018 300);
+  --rule-soft: oklch(31% .015 300);
+  --accent: oklch(79% .105 310);
+  --accent-hover: oklch(86% .08 310);
+  --accent-wash: oklch(79% .105 310 / .1);
+  --accent-ring: oklch(79% .105 310 / .22);
+  --on-accent: oklch(20% .02 300);
+  --oxide: oklch(77% .13 30);
+  --oxide-wash: oklch(77% .13 30 / .08);
 }
 
-/* ── Reset ────────────────────────────────────── */
-*, *::before, *::after {
-  margin: 0;
-  padding: 0;
+*,*::before,*::after {
   box-sizing: border-box;
 }
 
-html { -webkit-text-size-adjust: 100%; }
-
 body {
-  font-family: var(--face-text);
-  font-optical-sizing: auto;
+  margin: 0;
   background: var(--paper);
   color: var(--ink);
-  min-height: 100dvh;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
+  font-family: var(--face-text);
   font-size: 1rem;
   line-height: 1.6;
-  transition: background-color 0.3s var(--ease), color 0.3s var(--ease);
+  -webkit-font-smoothing: antialiased;
 }
 
-#root {
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
+h1,h2,h3,p,ol,ul {
+  margin: 0;
 }
 
-button, input, textarea {
+button,input,textarea {
   font: inherit;
   color: inherit;
 }
 
-/* ── Utility type roles ───────────────────────── */
-/* Mono carries every structural label: it is instrumentation, never prose. */
-.label {
-  font-family: var(--face-mono);
-  font-size: 0.625rem;
-  font-weight: 500;
-  font-stretch: 87.5%;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-3);
+button,a {
+  touch-action: manipulation;
 }
 
-/* ── Accessibility ────────────────────────────── */
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 4px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -123,64 +96,45 @@ button, input, textarea {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
-  border-width: 0;
+  border: 0;
 }
 
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 1px;
+.label,.section-kicker,.eyebrow {
+  font-size: .75rem;
+  font-weight: 600;
+  color: var(--ink-3);
 }
 
-/* ── Motion ───────────────────────────────────── */
-@keyframes set-in {
-  from { opacity: 0; transform: translateY(0.4em); }
-  to   { opacity: 1; transform: none; }
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 20;
+  transform: translateY(-160%);
+  padding: 10px 16px;
+  background: var(--sheet);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
 }
 
-@keyframes rule-draw {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
-}
-
-@keyframes wash {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.skip-link:focus {
+  transform: none;
 }
 
 @keyframes scan {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(400%); }
-}
-
-@keyframes swap-in {
-  from { opacity: 0; transform: scale(0.7); }
-  to   { opacity: 1; transform: none; }
-}
-
-/* Answer text arriving a word at a time. Mount order supplies the stagger,
-   so each token only has to fade itself in — no transform or filter, which
-   on inline text reads as a wobble rather than a reveal. */
-@keyframes token-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(450%);
   }
 }
 
-/* ── Scrollbar ────────────────────────────────── */
-::-webkit-scrollbar       { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: var(--rule);
-  border: 3px solid transparent;
-  background-clip: content-box;
-  border-radius: 99px;
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after {
+    animation-duration: .01ms!important;
+    animation-iteration-count: 1!important;
+    transition-duration: .01ms!important;
+    scroll-behavior: auto!important;
+  }
 }
