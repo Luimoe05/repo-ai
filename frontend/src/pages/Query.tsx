@@ -20,38 +20,42 @@ export default function Query({ repoUrl, chunks, onReset, theme, onToggleTheme }
 
   const count = exchanges.length
 
-  /* Mark whichever section is highest in the viewport as current, so the
-     contents rail tracks the reader rather than just the newest answer. */
+  useEffect(() => {
+    const root = scrollRef.current
+    if (!root) return
+    root.focus({ preventScroll: true })
+  }, [])
+
   useEffect(() => {
     const root = scrollRef.current
     if (!root || count === 0) return
-
-    const byNumber = new Map(exchanges.map(x => [`section-${x.n}`, x.id]))
-    const observer = new IntersectionObserver(
-      entries => {
-        const top = entries
-          .filter(e => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0]
-        if (top) setActiveId(byNumber.get(top.target.id) ?? null)
-      },
-      { root, rootMargin: '0px 0px -55% 0px' },
-    )
-
-    root.querySelectorAll('.sec').forEach(el => observer.observe(el))
-    return () => observer.disconnect()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [count])
+    let frame = 0
+    const update = () => {
+      const sections = [...root.querySelectorAll<HTMLElement>('.sec')]
+      const top = root.getBoundingClientRect().top + 48
+      const current = sections.filter(section => section.getBoundingClientRect().top <= top).at(-1) ?? sections[0]
+      const index = sections.indexOf(current)
+      setActiveId(exchanges[index]?.id ?? null)
+    }
+    const onScroll = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(update)
+    }
+    root.addEventListener('scroll', onScroll, { passive: true })
+    update()
+    return () => { root.removeEventListener('scroll', onScroll); cancelAnimationFrame(frame) }
+  }, [count, exchanges])
 
   /* Bring the newest section to the top of the page, the way turning to a
      new chapter would. */
   useEffect(() => {
     if (count === 0) return
-    document.getElementById(`section-${count}`)?.scrollIntoView({ block: 'start' })
+    document.getElementById(`section-${count}`)?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
   }, [count])
 
   const jump = (id: string) => {
     const target = exchanges.find(x => x.id === id)
-    if (target) document.getElementById(`section-${target.n}`)?.scrollIntoView({ block: 'start' })
+    if (target) document.getElementById(`section-${target.n}`)?.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
   }
 
   return (
@@ -68,9 +72,9 @@ export default function Query({ repoUrl, chunks, onReset, theme, onToggleTheme }
         <ContentsRail exchanges={exchanges} activeId={activeId} onJump={jump} />
 
         <div className="doc-col">
-          <main className="doc-scroll" ref={scrollRef}>
+          <main className="doc-scroll" ref={scrollRef} tabIndex={-1} aria-label="Repository answers">
             <div className="doc-sheet">
-              <Transcript exchanges={exchanges} onAsk={ask} onRetry={retry} />
+              <Transcript exchanges={exchanges} onAsk={ask} onRetry={retry} pending={pending} />
             </div>
           </main>
           <Composer onSubmit={ask} pending={pending} />
