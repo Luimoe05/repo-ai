@@ -67,7 +67,7 @@ export default function RepoInput({
 
   return (
     <form className="tp-form" onSubmit={handleSubmit} noValidate>
-      <label htmlFor="repo-url" className="input-label">GitHub repository URL</label>
+      <label htmlFor="repo-url" className="input-label sr-only">GitHub repository URL</label>
       <div className="field">
         <span className="field-mark" aria-hidden="true">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
@@ -93,12 +93,12 @@ export default function RepoInput({
         />
         <button className="action" type="submit" disabled={pending || !url.trim()}>
           {pending && <span className="busy-indicator" aria-hidden="true" />}
-          {pending ? 'Indexing…' : 'Explore repo'}
+          {pending ? 'Indexing…' : 'Explore repository'}
           {!pending && <span aria-hidden="true">→</span>}
         </button>
       </div>
 
-      <p className="input-help" id="repo-help">Public repositories only. Indexing may take a few minutes.</p>
+      <p className="input-help" id="repo-help">Public GitHub repositories · Indexing may take a few minutes.</p>
       {visibleError && (
         <p className="notice" id="repo-error" role="alert">
           <span className="notice-tag">Failed</span>
@@ -115,30 +115,27 @@ export default function RepoInput({
           </span>
         </p>
       )}
+      <div className="seeds">
+        <p className="seeds-label">Try a repository</p>
+        <ul className="repo-examples">
+          {SEEDS.map(seed => (
+            <li key={seed.url}>
+              <button type="button" className="repo-example" aria-pressed={selected?.url === seed.url} onClick={() => selectExample(seed.url)} disabled={pending} title={seed.description} aria-label={`Use ${seed.label}`}>
+                <span className="repo-example-name">{seed.label}</span>
+                <span className="repo-example-arrow" aria-hidden="true">{selected?.url === seed.url ? '✓' : '→'}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
       <div className="repo-feedback" aria-live="polite" aria-atomic="true">
         {pending ? (
           <div className="tp-progress">
             <p className="tp-progress-row"><span>{phase(elapsed)}</span><span className="tp-elapsed" aria-hidden="true">{clock(elapsed)}</span></p>
             <span className="scanline" aria-hidden="true" />
           </div>
-        ) : <p className="selection-note">{selected ? <><span aria-hidden="true">✓</span> {selected.label} selected. Ready to explore.</> : 'Choose an example below, or bring your own repository.'}</p>}
+        ) : <p className="selection-note">{selected ? <><span aria-hidden="true">✓</span> {selected.label} selected. Ready to explore.</> : ''}</p>}
       </div>
-      <div className="seeds">
-        <h3 className="seeds-label">Or explore an example</h3>
-        <ul className="repo-examples">
-          {SEEDS.map(seed => (
-            <li key={seed.url}>
-              <button type="button" className="repo-example" aria-pressed={selected?.url === seed.url} onClick={() => selectExample(seed.url)} disabled={pending} aria-label={`Use ${seed.label}`}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M5 4h14v17H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" /><path d="M7 4v13M3 17h16M11 8h4M11 11h4" /></svg>
-                <span className="repo-example-info"><span className="repo-example-name">{seed.label}</span><span className="repo-example-note">{seed.description}</span></span>
-                <span className="repo-language">{seed.language}</span><span className="repo-example-arrow" aria-hidden="true">{selected?.url === seed.url ? '✓' : '→'}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-
     </form>
   )
 }
