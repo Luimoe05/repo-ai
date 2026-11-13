@@ -1,24 +1,27 @@
 :root {
+  --motion-fast: 140ms;
+  --motion-state: 220ms;
+  --motion-view: 280ms;
   color-scheme: light;
-  --paper: oklch(98% .003 300);
-  --sheet: oklch(99.4% .002 300);
-  --sunk: oklch(95% .008 300);
-  --intro: oklch(94.6% .016 300);
-  --ink: oklch(25% .018 300);
-  --ink-2: oklch(44% .018 300);
-  --ink-3: oklch(49% .014 300);
-  --rule: oklch(83% .013 300);
-  --rule-soft: oklch(90% .009 300);
-  --accent: oklch(43% .12 310);
-  --accent-hover: oklch(36% .12 310);
-  --accent-wash: oklch(43% .12 310 / .08);
-  --accent-ring: oklch(43% .12 310 / .2);
+  --paper: oklch(97% .014 295);
+  --sheet: oklch(99.5% .003 295);
+  --sunk: oklch(94.7% .022 295);
+  --intro: oklch(93.5% .03 295);
+  --ink: oklch(30% .072 295);
+  --ink-2: oklch(44% .04 295);
+  --ink-3: oklch(49% .032 295);
+  --rule: oklch(82% .033 295);
+  --rule-soft: oklch(89% .025 295);
+  --accent: oklch(40% .14 295);
+  --accent-hover: oklch(34% .14 295);
+  --accent-wash: oklch(40% .14 295 / .07);
+  --accent-ring: oklch(40% .14 295 / .18);
   --on-accent: oklch(98% .005 300);
   --oxide: oklch(45% .16 30);
   --oxide-wash: oklch(45% .16 30 / .07);
-  --face-text: -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --face-text: 'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --face-code: ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  --radius: 8px;
+  --radius: 14px;
   --ease: cubic-bezier(.22,1,.36,1);
 }
 

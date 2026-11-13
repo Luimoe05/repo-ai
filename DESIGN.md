@@ -2,34 +2,36 @@
 
 ## Purpose and register
 
-The working interface is product UI. A developer should be able to open a repository, ask a question, and return to an answer without learning a new navigation model.
+The working interface is product UI. A developer opens a repository, asks a question, and returns to an answer without learning a new navigation model. The start screen borrows the spacious visual rhythm of https://www.nowadays.ai/ while keeping repository exploration as the primary task.
 
 ## Theme and color
 
-Scene: a developer at a daylight desk, reading an unfamiliar codebase alongside their editor. Light surfaces support sustained reading. A dark alternative preserves the same hierarchy for dim environments.
+Scene: a developer at a daylight desk, reading an unfamiliar codebase alongside their editor. Use a light lavender canvas, deep violet text, and near-white reading surfaces. The restrained color strategy reserves saturated violet for primary actions, keyboard focus, and selection. All color roles use OKLCH in `frontend/src/index.css`.
 
-Use restrained plum for primary actions, keyboard focus, and active questions. Neutral surfaces carry a slight violet tint. All color roles use OKLCH, defined in `frontend/src/index.css`; dark mode overrides the same roles. Errors use a separate oxide role and an explicit text label.
+Light is the default on first visit. A saved theme preference takes precedence. The dark alternative preserves the same hierarchy for dim environments. Errors use an oxide role and an explicit text label.
 
 ## Typography
 
-Use the native system sans stack for headings, labels, questions, and answers. Reserve monospace for code. Body copy is 15–16px; primary section titles are 28px; the desktop introduction is 42px. Prose is limited to 70ch. Labels use sentence case, with no decorative letter spacing or all-caps text.
+Self-host the variable Manrope font, with its OFL license in `frontend/public/fonts/`. Use the native sans stack as fallback and monospace for source code. The desktop introduction is 72px, with 60px, 48px, and 40px steps for smaller viewports. Keep working interface labels compact, body copy at 15–16px, and prose limited to 70ch. Use sentence case and solid text colors.
 
 ## Structure
 
-The start screen pairs a compact introduction with a repository input, example repository rows, and sample questions. The primary task stays visible without a marketing detour. On small screens the introduction compresses and the process list disappears.
+The start screen centers one introduction and one repository field. Compact example buttons populate and focus the field without submitting. A single secondary lavender panel demonstrates useful questions and lists supported languages. Avoid repeated setup instructions and extra introductory headings.
 
-The answer workspace has a repository toolbar, question history, a scrollable reading area, and an anchored composer. On small screens history becomes a horizontal index. Questions stay numbered so navigation remains connected to answers.
+The answer workspace uses a repository toolbar, question history, a scrollable reading surface, and an anchored composer. On small screens, history becomes a horizontally scrollable index. Numbered questions connect history entries to answers. The repository form stacks its action beneath the input on mobile.
 
 ## Components and behavior
 
-Fields use 12px corners, buttons use 10px corners, and toolbar controls use 44px minimum targets with a consistent visible focus outline. Inputs have persistent labels and contextual help. Example rows fill and focus the repository input without submitting. Disabled controls remain legible. Indexing uses an indeterminate indicator and elapsed time, never invented percentages or completion stages.
+Fields use 16px corners, primary buttons use 11px corners, theme and repository-switch controls use rounded shapes, and the secondary start-screen panel uses 24px corners. Interactive controls have at least 44px touch targets. Inputs have associated accessible labels and contextual help. Disabled controls remain legible. Errors appear beside the affected task and never rely on color alone.
 
-Answers render immediately. Motion only conveys pending state, and respects reduced-motion preferences. Use borders for grouping and tinted backgrounds for selection. Avoid decorative gradients, glass effects, side-stripe accents, repeated feature cards, and nested cards.
+Indexing uses an indeterminate indicator and elapsed time, without invented percentages or completion stages. Reserve feedback space so example selection does not shift nearby controls. URL validation accepts scheme-free GitHub repository roots. Long indexing failures retain the recovery action.
 
-## Motion and interaction polish
+Answers render immediately. The composer grows with its content, keeps focus after submission, and remains editable during a request. Only one answer request runs at a time; leaving aborts it. History follows reading position. Mobile form inputs use 16px type to avoid focus zoom.
 
-Reference: https://www.nowadays.ai/. Borrow its open spacing, softly tinted atmosphere, and rounded control shapes; keep RepoAI focused on the repository task. The start screen uses an open introduction with a restrained radial surface tint.
+## Motion and accessibility
 
-Use 140ms for press feedback, 220ms for control and content state changes, and 280ms for workspace transitions. Use the shared quintic ease-out curve. Navigation uses native View Transitions with a shared brand mark, falling back to immediate updates when unsupported or reduced motion is requested. Never delay an action for an animation. Loading skeletons and indicators stop animating under reduced motion.
+Use 140ms press feedback, 220ms control changes, and 280ms workspace transitions with the shared quintic ease-out curve. Native View Transitions share the brand mark, with immediate updates when unsupported or reduced motion is requested. Animate opacity and transforms only. Loading indicators respect reduced-motion preferences.
 
-Repository examples have persistent selected states. URL errors appear next to the field and accept scheme-free GitHub roots. Indexing feedback occupies reserved space. The composer grows to its content, keeps focus on submit, and remains editable during requests. Only one answer request runs at a time; leaving aborts it. Question history follows the reading position. All toolbar and row interactions have at least 44px touch targets; mobile form inputs use 16px type to avoid focus zoom.
+The start screen enters with a 560ms fade and 14px upward reveal. Stagger the introduction, repository field, supporting panel, and footer by up to 260ms. Keep navigation immediately visible. Focusing the repository field ends its entrance immediately. Skip the entrance entirely when reduced motion is preferred.
+
+Maintain visible keyboard focus, semantic landmarks, accessible control names, and sufficient text contrast. Avoid decorative gradients, glass effects, side-stripe accents, repeated feature cards, and nested cards.
